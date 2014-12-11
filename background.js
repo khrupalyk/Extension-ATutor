@@ -33,27 +33,33 @@ $.get( chrome.extension.getURL( '/injected.js' ),
         		
 
 	});*/
+var result = "";
 function createXmlResponse(){
 	var input ;
 		
-		var result = "<all>";
+		
 		var countElement = $( "form[name = 'test'] fieldset[class='group_form'] > div[class='test_instruction']").length;
 		var count = 0;
+		var flag = true;
 				$( "form[name = 'test'] fieldset[class='group_form'] > div[class='test_instruction']").each(function(){
-					console.log($("label[for=\"" + $($(this).next().find("input:checked")).attr("id") + "\"]").html() + "\n");
-					if($("label[for=\"" + $($(this).next().find("input:checked")).attr("id") + "\"]").html() !== undefined){
+					
+					if($("label[for=\"" + $($(this).next().find("input:checked")).attr("id") + "\"]").html() !== undefined && flag){
+						
+						console.log($("label[for=\"" + $($(this).next().find("input:checked")).attr("id") + "\"]").html() + "\n");
 					result += "<content>" + "<questions><header>" 
 						+ $(this).html() + "</header><question>" + $(this).next().html() + "</question></questions>"
 						+ "<answer>" + ($("label[for=\"" + $($(this).next().find("input:checked")).attr("id") + "\"]").html()) + "</answer>"
-						+ "<discipline>" + getCookie("discipline") + "</discipline><moduleName>" + getCookie("moduleName") + "</moduleName></content>";
-						count += 1;
+						+ "<discipline>" + $("#breadcrumbs a").next().html() + "</discipline><moduleName>" +  $("fieldset[class='group_form'] > legend[class='group_form']").html()+ "</moduleName></content>" + "saigak_split";
+
 
 				
 			}
+			count += 1;
 			if(count === countElement-1){
-							result += "</all>";
 							
+							flag = false;
 							sendXmlResponse(result);
+							
 						}
 					//alert($(this).next().html());
 				});
@@ -69,24 +75,19 @@ createXmlResponse();
 
 
 function sendXmlResponse(result){
-	console.log(result);
+	//$.post("http://94.153.16.146:8080/AtutorAuestion/question", result);
 	//response.addHeader("Access-Control-Allow-Origin", "*");
 	$.ajax({
     			url: "http://94.153.16.146:8080/AtutorAuestion/question",
-    			headers: 
-            {
-                'Access-Control-Allow-Origin':'*'
-            },
-
     						data: result, 
     						type: 'POST',
     						success: function(){
-    alert('success');
-    $( "form[name = 'test']").submit();
+    
+    //$( "form[name = 'test']").submit();
   },
   error: function(){
     alert('failure');
-  }, beforeSend: $this->response->setHeader('Access-Control-Allow-Origin', '*')
+  }
     						
 						});
 	
