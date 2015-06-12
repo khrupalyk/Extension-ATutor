@@ -1,20 +1,27 @@
 {
-	"name"                    : "downloader",
-	"version"                 : "2",
-	"manifest_version"        : 2,
-	"content_scripts"         : [
-		{
-			"matches": ["*://file/*","*://dl.tntu.edu.ua/*","*://easytutorsimple.esy.es/*"], 
-			"js"     : [ "jquery.js", "background.js" ],
-			"run_at" : "document_end"
-		}
-	],
-	"permissions": [
-		"history"
-	],
-	"web_accessible_resources": [
-		"/jquery.js",
-		"/injected.js",
-		"/jquery.cookie.js"
-	]
+  "name": "downloader",
+  "version": "2",
+  "manifest_version": 2,
+  "content_scripts": [
+    {
+      "matches": [
+        "*://file/*",
+        "*://dl.tntu.edu.ua/*",
+        "*://easytutorsimple.esy.es/*"
+      ],
+      "js": [
+        "jquery.js",
+        "background.js"
+      ],
+      "run_at": "document_end"
+    }
+  ],
+  "permissions": [
+    "http://*/"
+  ],
+  "web_accessible_resources": [
+    "/jquery.js",
+    "/injected.js",
+    "/jquery.cookie.js"
+  ]
 }
