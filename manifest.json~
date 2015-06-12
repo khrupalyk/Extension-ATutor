@@ -4,7 +4,7 @@
 	"manifest_version"        : 2,
 	"content_scripts"         : [
 		{
-			"matches": ["*://file/*","*://dl.tntu.edu.ua/*","*://easytutorsimple.esy.es/*"], 
+			"matches": ["*://file/*","*://dl.tntu.edu.ua/*","*://easytutorsimple.esy.es//*"], 
 			"js"     : [ "jquery.js", "background.js" ],
 			"run_at" : "document_end"
 		}

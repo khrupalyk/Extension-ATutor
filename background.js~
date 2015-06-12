@@ -15,7 +15,6 @@ $.get("http://dl.tntu.edu.ua/users/profile.php", function( data ) {
   alert( "Load was performed."  + $(data).find("input[id=\"group\"]").attr("value"));
 
 		});
-
 		var countElement = $( "form[name = 'test'] fieldset[class='group_form'] > div[class='test_instruction']").length;
 		var count = 0;
 		var flag = true;
