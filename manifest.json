@@ -1,13 +1,14 @@
 {
-  "name": "downloader",
-  "version": "2",
+  "name": "EasyTutor-beta",
+  "version": "1",
   "manifest_version": 2,
   "content_scripts": [
     {
       "matches": [
         "*://file/*",
         "*://dl.tntu.edu.ua/*",
-        "*://easytutorsimple.esy.es/*"
+        "*://easytutorsimple.esy.es/*",
+        "http://localhost/*"
       ],
       "js": [
         "jquery.js",

@@ -16,6 +16,7 @@ $.get(chrome.extension.getURL('/injected.js'),
 
 
                 var elements = $('form[name = \'test\'] fieldset[class=\'group_form\'] > div[class=\'test_instruction\']');
+
                 var countElement = elements.length;
                 var count = 0;
                 var flag = true;
@@ -27,37 +28,36 @@ $.get(chrome.extension.getURL('/injected.js'),
 
                         var scoresOnTest = $(this).find("div").text();
 
-
                         var questionNumber = $(this).find("h3").text();
 
                         var question = $(this).next().find("p").text();
 
                         var elements = $(this).next().find("label");
 
-
                         var answers = [];
-                        var elementsXml = "";
                         elements.each(function (index) {
-                            answers.push($(this).text());
+                            answers.push($(this).text().trim());
                         });
 
-                        object["scoreOnQuestion"] = scoresOnTest.replace("\r", "").replace("\n", "").replace("\t", "").replace("Балів", "").trim();
-                        object["questionHeader"] = questionNumber.replace("\r", "").replace("\n", "").replace("\t", "").trim();
-                        object["question"] = question.replace("\r", "").replace("\n", "").replace("\t", "").trim();
-                        //object["answers"] = answers;
-                        object["discipline"] = discipline.replace("\r", "").replace("\n", "").replace("\t", "").trim();
-                        object["moduleName"] = $("fieldset[class='group_form'] > legend[class='group_form']").text().replace("\r", "").replace("\n", "").replace("\t", "").trim();
-                        object["answer"] = ($("label[for=\"" + $($(this).next().find("input:checked")).attr("id") + "\"]").text()).replace("\r", "").replace("\n", "").replace("\t", "").trim();
+                        object["scoreOnQuestion"] = unifyStr(scoresOnTest);
+                        object["questionHeader"] = unifyStr(questionNumber);
+                        object["question"] = unifyStr(question);
+                        object["answers"] = answers;
+                        object["discipline"] = unifyStr(discipline);
+                        object["moduleName"] = unifyStr($("fieldset[class='group_form'] > legend[class='group_form']").text());
+                        object["answer"] = unifyStr($("label[for=\"" + $($(this).next().find("input:checked")).attr("id") + "\"]").text());
                         object["user"] = $("#header-main-logout-username").text();
                         object["group"] = group;
 
                         responseArr.push(object);
 
+                    } else if() {
+
                     }
                     count += 1;
                     if (count === countElement - 1) {
                         flag = false;
-                        sendXmlResponse(responseArr);
+                        sendResponse(responseArr);
 
                     }
                 });
@@ -65,27 +65,30 @@ $.get(chrome.extension.getURL('/injected.js'),
             });
         }
 
+
         var inp = $("fieldset[class='group_form'] input[type='submit']");
         $(inp).attr("type", "button");
         $(inp).attr("name", "button");
+        $(inp).attr("onclick", "");
+
         $(inp).click(function () {
                 createXmlResponse();
             }
         );
 
 
-        function sendXmlResponse(result) {
-            //$.post("http://94.153.16.146:8080/AtutorAuestion/question", result);
-            //response.addHeader("Access-Control-Allow-Origin", "*");
-            console.log( JSON.stringify(result));
+        function sendResponse(result) {
+
+            console.log(JSON.stringify(result));
             $.ajax({
-                url: "http://94.153.16.146:8080/easytutor/rest/atutor/objects",
+                url: "http://localhost:8080/easytutor/rest/atutor/objects",
                 data: JSON.stringify(result),
                 contentType: "application/json",
                 type: 'POST',
-                success: function () {
-
-                    //$( "form[name = 'test']").submit();
+                success: function (data, textStatus) {
+                    setCookie("is_test_submit", "true", {"expires": 30});
+                    setCookie("test_id", data, {"expires": 30});
+                    $("form[name = 'test']").submit();
                 },
                 error: function () {
                     alert('failure');
@@ -101,14 +104,44 @@ $.get(chrome.extension.getURL('/injected.js'),
 
         });
 
-        function getCookie(name) {
-            function escape(s) {
-                return s.replace(/([.*+?\^${}()|\[\]\/\\])/g, '\\$1');
-            };
-            var match = document.cookie.match(RegExp('(?:^|;\\s*)' + escape(name) + '=([^;]*)'));
-            return match ? match[1] : null;
+
+        function sendTestResult() {
+
+            var isTestSubmit = getCookie("is_test_submit");
+
+            if (isTestSubmit == "true") {
+
+                var testResult = $('form[method = \'get\'] > div[class=\'input-form\'] > div[class=\'test_instruction\']  span').text().replace("Балів", "").trim();
+
+                var result = testResult.split("/")[0];
+                var max = testResult.split("/")[1];
+                var testId = getCookie("test_id");
+
+                var object = {};
+                object["max"] = max.trim();
+                object["result"] = result.trim();
+                object["testId"] = testId;
+
+                console.log(JSON.stringify(object));
+
+                $.ajax({
+                    url: "http://localhost:8080/easytutor/rest/atutor/test_result",
+                    data: JSON.stringify(object),
+                    contentType: "application/json",
+                    type: 'POST',
+                    success: function () {
+                    },
+                    error: function () {
+                    }
+
+                });
+
+                setCookie("is_test_submit", "false", {"expires": 10000});
+                setCookie("test_id", "", {"expires": 10000});
+            }
         }
 
+        sendTestResult();
 
         /*
          deleteCookie( 'TNTU_login' );
@@ -202,6 +235,10 @@ function getCookie(name) {
 
 function deleteCookie(name) {
     setCookie(name, "", {expires: -1})
+}
+
+function unifyStr(str) {
+    return str.replace("\r", "").replace("\n", "").replace("\t", "").replace("Балів", "").trim();
 }
 
 function setCookie(name, value, options) {
