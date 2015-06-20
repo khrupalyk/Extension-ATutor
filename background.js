@@ -5,7 +5,7 @@ $.get(chrome.extension.getURL('/injected.js'),
         script.innerHTML = data;
         document.getElementsByTagName("head")[0].appendChild(script);
 
-        function createXmlResponse() {
+        function createJsonResponse() {
             var input;
             var discipline = $(".breadcrumbs-list > li").next().find("a").html();
             $.get("http://dl.tntu.edu.ua/users/profile.php", function (groupData) {
@@ -24,13 +24,9 @@ $.get(chrome.extension.getURL('/injected.js'),
                 responseObject["discipline"] = unifyStr(discipline);
                 responseObject["moduleName"] = unifyStr($("fieldset[class='group_form'] > legend[class='group_form']").text());
 
-
-                var countElement = elements.length;
-                var count = 0;
-                var flag = true;
                 elements.each(function () {
 
-                    if ($("label[for=\"" + $($(this).next().find("input:checked")).attr("id") + "\"]").html() !== undefined && flag) {
+                    if ($("label[for=\"" + $($(this).next().find("input:checked")).attr("id") + "\"]").html() !== undefined) {
 
                         var object = {};
 
@@ -56,36 +52,67 @@ $.get(chrome.extension.getURL('/injected.js'),
 
                         responseArr.push(object);
 
-                    } else if(true) {
+                    } else if (true) {
 
                     }
-                    count += 1;
-                    if (count === countElement - 1) {
-                        flag = false;
-                        responseObject["body"] = responseArr;
-                        sendResponse(responseObject);
 
-                    }
                 });
+
+                responseObject["body"] = responseArr;
+                sendResponse(responseObject);
 
             });
         }
 
+        var testForm = $("form[name = 'test']")[0];
 
-        var inp = $("fieldset[class='group_form'] input[type='submit']");
-        $(inp).attr("type", "button");
-        $(inp).attr("name", "button");
-        $(inp).attr("onclick", "");
+        if (testForm !== undefined) {
+            $(testForm).submit(function () {
+                createJsonResponse();
+            });
+        }
 
-        $(inp).click(function () {
-                createXmlResponse();
-            }
-        );
+        //$(inp).click(function () {
+        //        createXmlResponse();
+        //    }
+        //);
+
+        var startTest = $("form[name = 'form']")[0];
+
+        if(startTest !== undefined) {
+            $(startTest).submit(function (event) {
+                $.get("http://dl.tntu.edu.ua/users/profile.php", function (groupData) {
+                    var group = $(groupData).find("input[id=\"group\"]").attr("value");
+                    var discipline = $(".breadcrumbs-list > li").next().find("a").html();
+                    $.ajax({
+                        url: "http://localhost:8080/easytutor/rest/atutor/test/temp-test/" + discipline + "/" + group,
+                        type: 'GET',
+                        success: function (data, textStatus) {
+                            setCookie("is_test_submit", "true", {"expires": 30});
+                            setCookie("test_id", data, {"expires": 30});
+                            alert(data);
+                            //$("form[name = 'test']")[0].submit();
+                        },
+                        error: function () {
+                            alert('failure');
+                        }
+
+                    });
+                });
+
+                alert($(event.target).text())
+            });
+        }
+
+        //$(startTest).click(function () {
+        //        alert("awd");
+        //        $("form[name = 'form']")[0].submit();
+        //    }
+        //);
 
 
         function sendResponse(result) {
 
-            console.log(JSON.stringify(result));
             $.ajax({
                 url: "http://localhost:8080/easytutor/rest/atutor/test/questions",
                 data: JSON.stringify(result),
@@ -94,13 +121,15 @@ $.get(chrome.extension.getURL('/injected.js'),
                 success: function (data, textStatus) {
                     setCookie("is_test_submit", "true", {"expires": 30});
                     setCookie("test_id", data, {"expires": 30});
-                    $("form[name = 'test']").submit();
+                    //$("form[name = 'test']")[0].submit();
                 },
                 error: function () {
                     alert('failure');
                 }
 
             });
+
+            for(var i = 0; i < 1000000; i = i+1){} //TODO: Wait for response
 
         }
 
@@ -118,7 +147,8 @@ $.get(chrome.extension.getURL('/injected.js'),
             if (isTestSubmit == "true") {
 
                 var testResult = $('form[method = \'get\'] > div[class=\'input-form\'] > div[class=\'test_instruction\']  span').text().replace("Балів", "").trim();
-
+                alert(testResult);
+                //TODO: Check if test result exist in page before send to server
                 var result = testResult.split("/")[0];
                 var max = testResult.split("/")[1];
                 var testId = getCookie("test_id");
