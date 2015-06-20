@@ -7,15 +7,23 @@ $.get(chrome.extension.getURL('/injected.js'),
 
         function createXmlResponse() {
             var input;
-            var discipline = $(".breadcrumbs-list > li").next().find("a").html()
+            var discipline = $(".breadcrumbs-list > li").next().find("a").html();
             $.get("http://dl.tntu.edu.ua/users/profile.php", function (groupData) {
 
                 var responseArr = [];
 
                 var group = $(groupData).find("input[id=\"group\"]").attr("value");
 
-
                 var elements = $('form[name = \'test\'] fieldset[class=\'group_form\'] > div[class=\'test_instruction\']');
+
+
+                var responseObject = {};
+
+                responseObject["user"] = $("#header-main-logout-username").text();
+                responseObject["group"] = group;
+                responseObject["discipline"] = unifyStr(discipline);
+                responseObject["moduleName"] = unifyStr($("fieldset[class='group_form'] > legend[class='group_form']").text());
+
 
                 var countElement = elements.length;
                 var count = 0;
@@ -43,21 +51,19 @@ $.get(chrome.extension.getURL('/injected.js'),
                         object["questionHeader"] = unifyStr(questionNumber);
                         object["question"] = unifyStr(question);
                         object["answers"] = answers;
-                        object["discipline"] = unifyStr(discipline);
-                        object["moduleName"] = unifyStr($("fieldset[class='group_form'] > legend[class='group_form']").text());
                         object["answer"] = unifyStr($("label[for=\"" + $($(this).next().find("input:checked")).attr("id") + "\"]").text());
-                        object["user"] = $("#header-main-logout-username").text();
-                        object["group"] = group;
+
 
                         responseArr.push(object);
 
-                    } else if() {
+                    } else if(true) {
 
                     }
                     count += 1;
                     if (count === countElement - 1) {
                         flag = false;
-                        sendResponse(responseArr);
+                        responseObject["body"] = responseArr;
+                        sendResponse(responseObject);
 
                     }
                 });
@@ -81,7 +87,7 @@ $.get(chrome.extension.getURL('/injected.js'),
 
             console.log(JSON.stringify(result));
             $.ajax({
-                url: "http://localhost:8080/easytutor/rest/atutor/objects",
+                url: "http://localhost:8080/easytutor/rest/atutor/test/questions",
                 data: JSON.stringify(result),
                 contentType: "application/json",
                 type: 'POST',
@@ -118,14 +124,14 @@ $.get(chrome.extension.getURL('/injected.js'),
                 var testId = getCookie("test_id");
 
                 var object = {};
-                object["max"] = max.trim();
-                object["result"] = result.trim();
-                object["testId"] = testId;
+                object["maxScores"] = max.trim();
+                object["scores"] = result.trim();
+                object["id"] = testId;
 
                 console.log(JSON.stringify(object));
 
                 $.ajax({
-                    url: "http://localhost:8080/easytutor/rest/atutor/test_result",
+                    url: "http://localhost:8080/easytutor/rest/atutor/test/scores",
                     data: JSON.stringify(object),
                     contentType: "application/json",
                     type: 'POST',
