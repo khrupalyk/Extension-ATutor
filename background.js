@@ -8,6 +8,10 @@ $.get(chrome.extension.getURL('/injected.js'),
         function createJsonResponse() {
             var input;
             var discipline = $(".breadcrumbs-list > li").next().find("a").html();
+            var testId = getCookie("test_id")
+
+
+if(testId !== undefined)
             $.get("http://dl.tntu.edu.ua/users/profile.php", function (groupData) {
 
                 var responseArr = [];
@@ -20,6 +24,7 @@ $.get(chrome.extension.getURL('/injected.js'),
                 var responseObject = {};
 
                 responseObject["user"] = $("#header-main-logout-username").text();
+                responseObject["testId"] = testId
                 responseObject["group"] = group;
                 responseObject["discipline"] = unifyStr(discipline);
                 responseObject["moduleName"] = unifyStr($("fieldset[class='group_form'] > legend[class='group_form']").text());
@@ -77,19 +82,19 @@ $.get(chrome.extension.getURL('/injected.js'),
         //    }
         //);
 
+
         var startTest = $("form[name = 'form']")[0];
 
-        if(startTest !== undefined) {
+        if(startTest !== undefined && document.URL.startsWith("http://dl.tntu.edu.ua/mods/_standard/tests/test_intro.php")) {
             $(startTest).submit(function (event) {
                 $.get("http://dl.tntu.edu.ua/users/profile.php", function (groupData) {
-                    var group = $(groupData).find("input[id=\"group\"]").attr("value");
-                    var discipline = $(".breadcrumbs-list > li").next().find("a").html();
+                    
                     $.ajax({
-                        url: "http://localhost:8080/easytutor/rest/atutor/test/temp-test/" + discipline + "/" + group,
+                        url: "http://localhost:8080/easytutor/rest/test/temp-test",
                         type: 'GET',
                         success: function (data, textStatus) {
-                            setCookie("is_test_submit", "true", {"expires": 30});
-                            setCookie("test_id", data, {"expires": 30});
+                            setCookie("is_test_submit", "true", {});
+                            setCookie("test_id", data, {});
                             alert(data);
                             //$("form[name = 'test']")[0].submit();
                         },
@@ -100,7 +105,7 @@ $.get(chrome.extension.getURL('/injected.js'),
                     });
                 });
 
-                alert($(event.target).text())
+                
             });
         }
 
@@ -114,13 +119,13 @@ $.get(chrome.extension.getURL('/injected.js'),
         function sendResponse(result) {
 
             $.ajax({
-                url: "http://localhost:8080/easytutor/rest/atutor/test/questions",
+                url: "http://localhost:8080/easytutor/rest/test/questions",
                 data: JSON.stringify(result),
                 contentType: "application/json",
                 type: 'POST',
                 success: function (data, textStatus) {
-                    setCookie("is_test_submit", "true", {"expires": 30});
-                    setCookie("test_id", data, {"expires": 30});
+                    // setCookie("is_test_submit", "true", {"expires": 30});
+                    // setCookie("test_id", data, {"expires": 30});
                     //$("form[name = 'test']")[0].submit();
                 },
                 error: function () {
@@ -161,7 +166,7 @@ $.get(chrome.extension.getURL('/injected.js'),
                 console.log(JSON.stringify(object));
 
                 $.ajax({
-                    url: "http://localhost:8080/easytutor/rest/atutor/test/scores",
+                    url: "http://localhost:8080/easytutor/rest/test/scores",
                     data: JSON.stringify(object),
                     contentType: "application/json",
                     type: 'POST',
