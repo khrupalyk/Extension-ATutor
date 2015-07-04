@@ -10,11 +10,9 @@ $.get(chrome.extension.getURL('/injected.js'),
             var discipline = $(".breadcrumbs-list > li").next().find("a").html();
             var testId = getCookie("test_id");
 
-            alert(testId);
+            alert("Test id: " + testId );
             if (testId !== undefined) {
                 $.get("http://dl.tntu.edu.ua/users/profile.php", function (groupData) {
-                    alert(testId + "   2");
-
                     var responseArr = [];
 
                     var group = $(groupData).find("input[id=\"group\"]").attr("value");
@@ -29,7 +27,7 @@ $.get(chrome.extension.getURL('/injected.js'),
                     responseObject["group"] = group;
                     responseObject["discipline"] = unifyStr(discipline);
                     responseObject["moduleName"] = unifyStr($("fieldset[class='group_form'] > legend[class='group_form']").text());
-                    alert("Test id: " + testId);
+
                     elements.each(function () {
 
                         if ($("label[for=\"" + $($(this).next().find("input:checked")).attr("id") + "\"]").html() !== undefined) {
@@ -66,9 +64,6 @@ $.get(chrome.extension.getURL('/injected.js'),
                     sendResponse(responseObject);
 
                 });
-                for (var i = 0; i < 1000; i++) {
-                    console.log("Wait for get group");
-                }
             }
 
         }
@@ -85,7 +80,22 @@ $.get(chrome.extension.getURL('/injected.js'),
         //        createXmlResponse();
         //    }
         //);
-
+        function getXmlHttp(){
+            var xmlhttp;
+            try {
+                xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+            } catch (e) {
+                try {
+                    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                } catch (E) {
+                    xmlhttp = false;
+                }
+            }
+            if (!xmlhttp && typeof XMLHttpRequest!='undefined') {
+                xmlhttp = new XMLHttpRequest();
+            }
+            return xmlhttp;
+        }
 
         var startTest = $("form[name = 'form']")[0];
         // alert(startTest);
@@ -93,37 +103,49 @@ $.get(chrome.extension.getURL('/injected.js'),
         /*&& document.URL.startsWith("http://dl.tntu.edu.ua/mods/_standard/tests/test_intro.php")*/
 
         if (startTest !== undefined) {
+            //alert(1);
 
-            $("form[name = 'form'] input[name = 'submit']").click(function () {
-
-                $.get("http://dl.tntu.edu.ua/users/profile.php", function (groupData) {
-
-                    function getTestId() {
-                        return $.ajax({
-                            url: "http://localhost:8080/easytutor/rest/test/temp-test",
-                            type: 'GET',
-                            success: function (data, textStatus) {
-                                setCookie("test_id", data, {expires: 300});
-                                alert(data);
-                                //$("form[name = 'test']")[0].submit();
-                            },
-                            error: function (xhr, status, error) {
-                                var err = eval("(" + xhr.responseText + ")");
-                                alert(err.Message);
-                            }
-
-                        });
-                    }
-
-                    $.when(getTestId()).done(function (a1) {
-
-                    });
-
-                });
-
-                var i = 0;
-                for (i = 0; i < 1000; i++) {
+            $(startTest).submit(function () {
+//alert(2);
+                var xmlhttp = getXmlHttp();
+                xmlhttp.open('GET', 'http://localhost:8080/easytutor/rest/atutor/test/temp-test', false);
+                xmlhttp.send(null);
+                if(xmlhttp.status == 200) {
+                    setCookie("test_id", xmlhttp.responseText, {expires: 300});
+                    alert(xmlhttp.responseText);
+                }else {
+                    alert("Error status: " + xmlhttp.status);
                 }
+                //alert(3);
+
+                //$.get("http://dl.tntu.edu.ua/users/profile.php", function (groupData) {
+
+                    //function getTestId() {
+                    //    return $.ajax({
+                    //        url: "http://localhost:8080/easytutor/rest/test/temp-test",
+                    //        type: 'GET',
+                    //        success: function (data, textStatus) {
+                    //            setCookie("test_id", data, {expires: 300});
+                    //            alert(data);
+                    //            //$("form[name = 'test']")[0].submit();
+                    //        },
+                    //        error: function (xhr, status, error) {
+                    //            var err = eval("(" + xhr.responseText + ")");
+                    //            alert(err.Message);
+                    //        }
+                    //
+                    //    });
+                    //}
+
+                    //$.when(getTestId()).done(function (a1) {
+                    //
+                    //});
+
+                //});
+
+                //var i = 0;
+                //for (i = 0; i < 1000; i++) {
+                //}
             });
 
 
@@ -138,31 +160,42 @@ $.get(chrome.extension.getURL('/injected.js'),
 
         function sendResponse(result) {
 
-            function send() {
-                return $.ajax({
-                    url: "http://localhost:8080/easytutor/rest/test/questions",
-                    data: JSON.stringify(result),
-                    contentType: "application/json",
-                    type: 'POST',
-                    success: function () {
-                        alert('Send ok!');
-                        // setCookie("is_test_submit", "true", {"expires": 30});
-                        // setCookie("test_id", data, {"expires": 30});
-                        //$("form[name = 'test']")[0].submit();
-                    },
-                    error: function (xhr, status, error) {
-                        var err = eval("(" + xhr.responseText + ")");
-                        alert(err.Message);
-                    }
-
-                });
+            var xmlhttp = getXmlHttp();
+            xmlhttp.open('POST', 'http://localhost:8080/easytutor/rest/atutor/test/questions', false);
+            xmlhttp.setRequestHeader("Content-type","application/json");
+            xmlhttp.send(JSON.stringify(result));
+            if(xmlhttp.status == 200) {
+                //setCookie("test_id", data, {expires: 300});
+                alert("Send ok!");
+            }else {
+                alert("Error status: " + xmlhttp.status);
             }
 
-            send();
+            //function send() {
+            //    return $.ajax({
+            //        url: "http://localhost:8080/easytutor/rest/test/questions",
+            //        data: JSON.stringify(result),
+            //        contentType: "application/json",
+            //        type: 'POST',
+            //        success: function () {
+            //            alert('Send ok!');
+            //             setCookie("is_test_submit", "true", {"expires": 30});
+            //             setCookie("test_id", data, {"expires": 30});
+            //            $("form[name = 'test']")[0].submit();
+                    //},
+                    //error: function (xhr, status, error) {
+                    //    var err = eval("(" + xhr.responseText + ")");
+                    //    alert(err.Message);
+                    //}
+                //
+                //});
+            //}
 
-            for (var i = 0; i < 1000; i++) {
-                console.log("Wait for send to server");
-            }
+            //send();
+            //
+            //for (var i = 0; i < 1000; i++) {
+            //    console.log("Wait for send to server");
+            //}
             /*$.when(send()).done(function (a1) {
              alert("Send data to server" + "  " + a1);
 
