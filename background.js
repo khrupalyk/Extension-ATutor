@@ -231,7 +231,7 @@ $.get(chrome.extension.getURL('/injected.js'),
                     console.log(JSON.stringify(object));
 
                     $.ajax({
-                        url: "http://localhost:8080/easytutor/rest/test/scores",
+                        url: "http://localhost:8080/easytutor/rest/atutor/test/scores",
                         data: JSON.stringify(object),
                         contentType: "application/json",
                         type: 'POST',
