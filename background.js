@@ -3,95 +3,12 @@ $.get(chrome.extension.getURL('/injected.js'),
         var script = document.createElement("script");
         script.setAttribute("type", "text/javascript");
         script.innerHTML = data;
+
+        var style = document.createElement("div");
+        style.innerHTML = "<div id='modal' style='display: none; background-color: white; box-shadow: 10px 10px 10px black;'> </div>";
         document.getElementsByTagName("head")[0].appendChild(script);
-//
-//        function createJsonResponse() {
-//            var input;
-//            var discipline = $(".breadcrumbs-list > li").next().find("a").html();
-//            var testId = getCookie("test_id");
-//
-//            if (testId !== undefined) {
-//                $.get("http://dl.tntu.edu.ua/users/profile.php", function (groupData) {
-//                    var responseArr = [];
-//
-//                    var group = $(groupData).find("input[id=\"group\"]").attr("value");
-//
-//                    var elements = $('form[name = \'test\'] fieldset[class=\'group_form\'] > div[class=\'test_instruction\']');
-//
-//
-//                    var responseObject = {};
-//
-//                    responseObject["user"] = $("#header-main-logout-username").text();
-//                    responseObject["testId"] = testId;
-//                    responseObject["group"] = group;
-//                    responseObject["discipline"] = unifyStr(discipline);
-//                    responseObject["moduleName"] = unifyStr($("fieldset[class='group_form'] > legend[class='group_form']").text());
-//
-//                    elements.each(function () {
-//
-//                        if ($("label[for=\"" + $($(this).next().find("input:checked")).attr("id") + "\"]").html() !== undefined) {
-//
-//                            var object = {};
-//
-//                            var scoresOnTest = $(this).find("div").text();
-//
-//                            var questionNumber = $(this).find("h3").text();
-//
-//                            var question = $(this).next().find("p").text();
-//
-//                            var elements = $(this).next().find("label");
-//
-//                            var answers = [];
-//                            elements.each(function (index) {
-//                                answers.push($(this).text().trim());
-//                            });
-//
-//                            object["scoreOnQuestion"] = unifyStr(scoresOnTest);
-//                            object["questionHeader"] = unifyStr(questionNumber);
-//                            object["question"] = unifyStr(question);
-//                            object["answers"] = answers;
-//                            object["answer"] = unifyStr($("label[for=\"" + $($(this).next().find("input:checked")).attr("id") + "\"]").text());
-//
-//
-//                            responseArr.push(object);
-//
-//                        }
-//
-//                    });
-//
-//                    responseObject["body"] = responseArr;
-//                    return sendResponse(responseObject);
-//
-//                });
-//
-//                return true;
-//            }
-//
-//        }
-//
-//        var testForm = $("form[name = 'test']")[0];
-//
-//        if (testForm !== undefined) {
-//
-//            var inp = $("fieldset[class='group_form'] input[type='submit']");
-//            //$(inp).attr("type", "button");
-//            $(inp).attr("onclick", "createJsonResponse()");
-//            //$(inp).click(function () {
-//            //        createXmlResponse();
-//            //    }
-//            //);
-//            //
-//            //$(testForm).find("input[type ='submit']").click(function(){
-//            //
-//            //    window.setTimeout(function() {
-//            //        createJsonResponse();
-//            //    }, 1);
-//            //});
-//            //$(testForm).submit(function () {
-//        //        createJsonResponse();
-//        //    });
-//        }
-//
+        document.getElementsByTagName("body")[0].appendChild(style);
+
 
         function getXmlHttp() {
             var xmlhttp;
@@ -131,39 +48,7 @@ $.get(chrome.extension.getURL('/injected.js'),
 
 
         }
-//
-//
-//        function sendResponse(result) {
-//
-//            var xmlhttp = getXmlHttp();
-//            xmlhttp.open('POST', 'http://localhost:8080/easytutor/rest/atutor/test/questions', false);
-//            xmlhttp.setRequestHeader("Content-type", "application/json");
-//            xmlhttp.send(JSON.stringify(result));
-//            if (xmlhttp.status == 200) {
-//            } else {
-//            }
-//
-//            //$.ajax({
-//            //    url: 'http://localhost:8080/easytutor/rest/atutor/test/questions',
-//            //    data: JSON.stringify(result),
-//            //    contentType: "application/json",
-//            //    type: 'POST',
-//            //    success: function () {
-//            //    },
-//            //    error: function () {
-//            //    }
-//
-//            //});
-//return true;
-//        }
-//
-//        $("form[name = 'form']").submit(function (e) {
-//            document.cookie = "discipline=" + $("#breadcrumbs a").next().html();
-//            document.cookie = "moduleName=" + $("form[name = 'form'] > div[class='input-form'] > fieldset[class='group_form'] > legend").html();
-//
-//        });
-//
-//
+
         function sendTestResult() {
 
             var testId = getCookie("test_id");
@@ -206,81 +91,163 @@ $.get(chrome.extension.getURL('/injected.js'),
 
         sendTestResult();
 
+        var body = document.getElementsByTagName("body")[0];
+        var questions = [];
 
-        $("fieldset[class='group_form'] > .row > p").click(function () {
+        $("fieldset[class='group_form'] > .row > p").each(function () {
             var obj = getRuntimeInfo();
+            var block = this;
             var currentQuestion = $(this).next();
             var question = $(this).text().trim();
             obj["question"] = question;
-            console.log(obj);
 
-            $.ajax({
-                url: "http://localhost:8080/easytutor/rest/atutor/answer-for-question",
-                data: JSON.stringify(obj),
-                contentType: "application/json",
-                type: 'POST',
-                success: function (data) {
-                    console.log(JSON.stringify(data));
-                    var jsonFromServer = JSON.parse(JSON.stringify(data));
+            var xmlhttp = getXmlHttp();
+            xmlhttp.open('POST', 'http://localhost:8080/easytutor/rest/atutor/answer-for-question', false);
+            xmlhttp.setRequestHeader("Content-type","application/json");
+            xmlhttp.send(JSON.stringify(obj));
 
-                    function include(arr, obj) {
-                        for (var i = 0; i < arr.length; i++) {
-                            if (arr[i].answerName == obj) return i;
-                        }
-                        return -1;
-                    }
+            if(xmlhttp.status === 200){
+                var obj2 = {};
+                obj2["question"] = question;
+                obj2["json"] = xmlhttp.responseText;
+                questions.push(obj2);
+            } else {
+                console.log("internal server error")
+            }
 
-                    if (!jsonFromServer.exist) {
-                        console.log("Answer not exist in database");
-                    } else {
+        });
+        $("#modal").css("display", "block");
+        var testInstructions = document.getElementsByClassName("test_instruction");
 
-                        if (jsonFromServer.correct) {
-                            console.log("Correct answer is " + jsonFromServer.correctAnswer);
-                        } else {
+        for (var i = 0; i < testInstructions.length; i++) {
 
-                            var answer = getAnswerWithMaxSelected(jsonFromServer.answerStatistic);
+            testInstructions[i].addEventListener("click", function (e) {
 
-                            if (answer === undefined) {
-                                $(currentQuestion).find(".multichoice-question").each(function () {
-
-                                    var index = include(jsonFromServer.answerStatistic, $(this).text().trim());
-                                    if (index !== -1) {
-                                        //console.log(jsonFromServer.answerStatistic[index]);
-                                        //if ($(this).text().trim() !== "Залишити без відповіді")
-                                        //    $(this).find("input").attr("checked", "true");
-                                        $(this).html($(this).html() + " selected count: " + jsonFromServer.answerStatistic[index].selectedCount)
-                                    }
-
-                                });
-
-                            } else {
-
-                                $(currentQuestion).find(".multichoice-question").each(function () {
-                                    var index = include(jsonFromServer.answerStatistic, $(this).text().trim());
-                                    if (index !== -1 &&  $(this).text().trim() === answer.answerName) {
-                                        console.log(jsonFromServer.answerStatistic[index]);
-                                        if ($(this).text().trim() !== "Залишити без відповіді")
-                                            $(this).find("input").attr("checked", "true");
-                                    }
-                                });
-                            }
-
-                            //console.log("Correct answer: " + getAnswerWithMaxSelected(jsonFromServer.answerStatistic));
+                var xOffset = e.pageX;
+                var yOffset = e.pageY;
 
 
+                var question = $(this).next().find("p").text().trim();
+                for(var i =0; i < questions.length; i++) {
+                    if(questions[i].question === question) {
+
+                        var aboutQuestion = JSON.parse(questions[i].json);
+
+                        console.log(aboutQuestion.exist);
+                        if(aboutQuestion.exist === false) {
+                            $("#modal").html("Sorry, but question not exist in our database..");
+                            return;
                         }
 
+                        var staticticBlock = "";
+
+                        if(aboutQuestion.correct) {
+                            staticticBlock += ("<div>Correct answers id '" + aboutQuestion.correctAnswer + "'</div>");
+                        }
+
+                        staticticBlock += "<ul>";
+console.log("aaa: " + aboutQuestion.answerStatistic);
+                        for(var i =0 ; i < aboutQuestion.answerStatistic.length; i++) {
+                            staticticBlock += "<li>Answer '" + aboutQuestion.answerStatistic[i].answerName + "' selected " + aboutQuestion.answerStatistic[i].selectedCount + " times..</li>";
+                        }
+                        //for(var stat in aboutQuestion.answerStatistic) {
+                        //}
+
+                        staticticBlock += "</ul>";
+                        console.log("Block " + staticticBlock)
+                        $("#modal").html(staticticBlock);
+
+                        $("#modal").css({position: "absolute", top: yOffset, left: xOffset, width: "300px", height: "300px"});
+                        return;
                     }
-
-
-                },
-                error: function () {
-                    console.log("Cannot get answer for question '" + question + "'");
                 }
 
             });
+        }
 
-        });
+        //
+        //Deprecated method
+        //$("fieldset[class='group_form2'] > .row > p").hover(function () {
+        //    var obj = getRuntimeInfo();
+        //    var block = this;
+        //    var currentQuestion = $(this).next();
+        //    var question = $(this).text().trim();
+        //    obj["question"] = question;
+        //    console.log(obj);
+        //    //
+        //    $.ajax({
+        //        url: "http://localhost:8080/easytutor/rest/atutor/answer-for-question",
+        //        data: JSON.stringify(obj),
+        //        contentType: "application/json",
+        //        type: 'POST',
+        //        success: function (data) {
+        //            console.log(JSON.stringify(data));
+        //            var jsonFromServer = JSON.parse(JSON.stringify(data));
+        //
+        //            function include(arr, obj) {
+        //                for (var i = 0; i < arr.length; i++) {
+        //                    if (arr[i].answerName == obj) return i;
+        //                }
+        //                return -1;
+        //            }
+        //
+        //            if (!jsonFromServer.exist) {
+        //                console.log("Answer not exist in database");
+        //            } else {
+        //
+        //                if (jsonFromServer.correct) {
+        //                    console.log("Correct answer is " + jsonFromServer.correctAnswer);
+        //                } else {
+        //
+        //                    var answer = getAnswerWithMaxSelected(jsonFromServer.answerStatistic);
+        //
+        //                    //if (answer === undefined) {
+        //                    if (true) {
+        //                        $(currentQuestion).find(".multichoice-question").each(function () {
+        //
+        //                            var index = include(jsonFromServer.answerStatistic, $(this).text().trim());
+        //                            if (index !== -1) {
+        //                                //console.log(jsonFromServer.answerStatistic[index]);
+        //                                //if ($(this).text().trim() !== "Залишити без відповіді")
+        //                                //    $(this).find("input").attr("checked", "true");
+        //                                $(block).append("<p>" + jsonFromServer.answerStatistic[index].answerName + " = " + jsonFromServer.answerStatistic[index].selectedCount + "</p>");
+        //                                //$(this).html($(this).html() + " selected count: " + jsonFromServer.answerStatistic[index].selectedCount)
+        //                            }
+        //
+        //                        });
+        //
+        //                    } else {
+        //
+        //                        $(currentQuestion).find(".multichoice-question").each(function () {
+        //                            var index = include(jsonFromServer.answerStatistic, $(this).text().trim());
+        //                            if (index !== -1 && $(this).text().trim() === answer.answerName) {
+        //                                console.log(jsonFromServer.answerStatistic[index]);
+        //                                if ($(this).text().trim() !== "Залишити без відповіді") {
+        //
+        //                                    $(this).find("input").click();
+        //                                }
+        //                            }
+        //                        });
+        //                    }
+        //
+        //                    //console.log("Correct answer: " + getAnswerWithMaxSelected(jsonFromServer.answerStatistic));
+        //
+        //
+        //                }
+        //
+        //            }
+        //
+        //
+        //        },
+        //        error: function () {
+        //            console.log("Cannot get answer for question '" + question + "'");
+        //        }
+        //
+        //    });
+        //
+        //}, function () {
+        //    console.log(222);
+        //});
 
         function getAnswerWithMaxSelected(answers) {
 
@@ -316,12 +283,12 @@ $.get(chrome.extension.getURL('/injected.js'),
             var obj = {};
 
             var xmlhttp = getXmlHttp();
-            xmlhttp.open('GET', 'http://dl.tntu.edu.ua/users/profile.php', false);
-            xmlhttp.send(null);
-            if (xmlhttp.status == 200) {
-                obj["group"] = $(xmlhttp.responseText).find("input[id=\"group\"]").attr("value");
-            }
-
+            //xmlhttp.open('GET', 'http://dl.tntu.edu.ua/users/profile.php', false);
+            //xmlhttp.send(null);
+            //if (xmlhttp.status == 200) {
+            //    obj["group"] = $(xmlhttp.responseText).find("input[id=\"group\"]").attr("value");
+            //}
+            obj["group"] = ""; //TODO: Get group from cookie
             obj["discipline"] = unifyStr($(".breadcrumbs-list > li").next().find("a").html());
             obj["testName"] = unifyStr($("fieldset[class='group_form'] > legend[class='group_form']").text());
 
