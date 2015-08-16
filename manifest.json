@@ -7,8 +7,7 @@
       "matches": [
         "*://file/*",
         "*://dl.tntu.edu.ua/*",
-        "*://easytutorsimple.esy.es/*",
-        "http://localhost/*"
+        "*://easytutorsimple.esy.es/*"
       ],
       "js": [
         "jquery.js",
