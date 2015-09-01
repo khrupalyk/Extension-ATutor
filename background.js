@@ -1,5 +1,8 @@
 $.get(chrome.extension.getURL('/injected.js'),
     function (data) {
+
+        var SERVER_URL = "http://localhost:8080/easytutor";
+
         var script = document.createElement("script");
         script.setAttribute("type", "text/javascript");
         script.innerHTML = data;
@@ -24,11 +27,11 @@ $.get(chrome.extension.getURL('/injected.js'),
 
         var link = document.createElement("link");
         link.setAttribute("rel", "stylesheet");
-        link.setAttribute("href", "https://fezvrasta.github.io/bootstrap-material-design/dist/css/material-fullpalette.min.css");
+        link.setAttribute("href", SERVER_URL + "/resources/css/atutor.dialog.css");
 
         document.getElementsByTagName("head")[0].appendChild(script);
         document.getElementsByTagName("head")[0].appendChild(style);
-        document.getElementsByTagName("head")[0].appendChild(link);
+        document.getElementsByTagName("body")[0].appendChild(link);
         document.getElementsByTagName("body")[0].appendChild(modalDiv);
 
 
@@ -68,7 +71,7 @@ $.get(chrome.extension.getURL('/injected.js'),
 
             $(startTest).submit(function () {
                 var xmlhttp = getXmlHttp();
-                xmlhttp.open('GET', 'http://localhost:8080/easytutor/rest/atutor/test/temp-test', false);
+                xmlhttp.open('GET', SERVER_URL + '/rest/atutor/test/temp-test', false);
                 xmlhttp.send(null);
                 if (xmlhttp.status == 200) {
                     setCookie("test_id", xmlhttp.responseText, {expires: 300});
@@ -103,7 +106,7 @@ $.get(chrome.extension.getURL('/injected.js'),
                     console.log(JSON.stringify(object));
 
                     $.ajax({
-                        url: "http://localhost:8080/easytutor/rest/atutor/test/scores",
+                        url: SERVER_URL + "/rest/atutor/test/scores",
                         data: JSON.stringify(object),
                         contentType: "application/json",
                         type: 'POST',
@@ -145,13 +148,15 @@ $.get(chrome.extension.getURL('/injected.js'),
 
         if(questions.length !== 0) {
             var xmlhttp = getXmlHttp();
-            xmlhttp.open('POST', 'http://localhost:8080/easytutor/rest/atutor/answer-for-question', false);
+            xmlhttp.open('POST', SERVER_URL + '/rest/atutor/answer-for-question', false);
             xmlhttp.setRequestHeader("Content-type", "application/json");
             xmlhttp.send(JSON.stringify(runtimeInfo));
+            //console.log(JSON.stringify(runtimeInfo));
 
             if (xmlhttp.status === 200) {
                 var obj2 = {};
                 answers = JSON.parse(xmlhttp.responseText);
+                console.log(JSON.parse(xmlhttp.responseText));
                 //questions.push(obj2);
                 //console.log(JSON.stringify(answers))
             } else {
@@ -253,7 +258,7 @@ $.get(chrome.extension.getURL('/injected.js'),
         //    console.log(obj);
         //    //
         //    $.ajax({
-        //        url: "http://localhost:8080/easytutor/rest/atutor/answer-for-question",
+        //        url: "http://ec2-54-68-142-11.us-west-2.compute.amazonaws.com/easytutor/rest/atutor/answer-for-question",
         //        data: JSON.stringify(obj),
         //        contentType: "application/json",
         //        type: 'POST',
@@ -359,7 +364,7 @@ $.get(chrome.extension.getURL('/injected.js'),
         function getRuntimeInfo() {
             var obj = {};
 
-            obj["group"] = getCookie("group"); //TODO: Get group from cookie
+            obj["group"] = getCookie("group");
             obj["discipline"] = unifyStr($(".breadcrumbs-list > li").next().find("a").html());
             obj["testName"] = unifyStr($("fieldset[class='group_form'] > legend[class='group_form']").text());
 
