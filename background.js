@@ -2,13 +2,15 @@ $.get(chrome.extension.getURL('/injected.js'),
     function (data) {
 
         var SERVER_URL = "http://localhost:8080/easytutor";
+        //var SERVER_URL = "http://ec2-54-68-142-11.us-west-2.compute.amazonaws.com/easytutor";
 
         var script = document.createElement("script");
         script.setAttribute("type", "text/javascript");
         script.innerHTML = data;
 
         var modalDiv = document.createElement("div");
-        modalDiv.innerHTML = "<div id='modal' class='jumbotron'> </div>";
+        modalDiv.innerHTML = "<div id='modal' class='jumbotron'></div>";
+        var closeBlock = "<button type='button' class='close close-answers' data-dismiss='modal' aria-hidden='true' style='margin-top: -15px; margin-right: -15px;'>×</button> ";
 
         var style = document.createElement("style");
         style.innerHTML = "#modal { display: block; position: absolute;width: 400px;height: 300px; background-color: white;}" +
@@ -30,7 +32,7 @@ $.get(chrome.extension.getURL('/injected.js'),
         link.setAttribute("href", SERVER_URL + "/resources/css/atutor.dialog.css");
 
         document.getElementsByTagName("head")[0].appendChild(script);
-        document.getElementsByTagName("head")[0].appendChild(style);
+        //document.getElementsByTagName("head")[0].appendChild(style);
         document.getElementsByTagName("body")[0].appendChild(link);
         document.getElementsByTagName("body")[0].appendChild(modalDiv);
 
@@ -146,7 +148,7 @@ $.get(chrome.extension.getURL('/injected.js'),
 
         var answers = [];
 
-        if(questions.length !== 0) {
+        if (questions.length !== 0) {
             var xmlhttp = getXmlHttp();
             xmlhttp.open('POST', SERVER_URL + '/rest/atutor/answer-for-question', false);
             xmlhttp.setRequestHeader("Content-type", "application/json");
@@ -166,6 +168,7 @@ $.get(chrome.extension.getURL('/injected.js'),
 
         $("#modal").css("display", "none");
         var testInstructions = document.getElementsByClassName("test_instruction");
+
 
         for (var i = 0; i < testInstructions.length; i++) {
 
@@ -187,7 +190,7 @@ $.get(chrome.extension.getURL('/injected.js'),
                         existInDatabase = true;
                         console.log(JSON.stringify(aboutQuestion) + " " + i);
                         if (aboutQuestion.exist === false) {
-                            $("#modal").html("<span style='padding-bottom: 10px;'>Sorry, but question not exist in our database..</span>");
+                            $("#modal").html(closeBlock + "<span style='padding-bottom: 10px;'>Sorry, but question not exist in our database..</span>");
                             $("#modal").css({
                                 position: "absolute",
                                 top: yOffset,
@@ -200,7 +203,7 @@ $.get(chrome.extension.getURL('/injected.js'),
                         }
 
 
-                        var staticticBlock = "<div id='answers_stat'>";
+                        var staticticBlock = closeBlock + "<div id='answers_stat'>";
 
                         if (aboutQuestion.correct) {
                             staticticBlock += ("<div class='active_choice active simple'><i class='mdi-navigation-check'></i>" + aboutQuestion.correctAnswer + "</div>");
@@ -233,7 +236,7 @@ $.get(chrome.extension.getURL('/injected.js'),
                 }
 
                 if (existInDatabase === false) {
-                    $("#modal").html("<span style='padding-bottom: 10px;'>Sorry, but question not exist in our database..</span>");
+                    $("#modal").html(closeBlock + "<span style='padding-bottom: 10px;'>Sorry, but question not exist in our database..</span>");
                     $("#modal").css({
                         position: "absolute",
                         top: yOffset,
@@ -243,6 +246,10 @@ $.get(chrome.extension.getURL('/injected.js'),
                         height: "50px"
                     });
                 }
+
+                $(".close-answers").click(function(){
+                    $(this).parent().css("display", "none");
+                });
 
             });
         }

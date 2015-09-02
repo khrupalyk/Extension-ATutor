@@ -1,3 +1,6 @@
+var SERVER_URL = "http://localhost:8080/easytutor";
+        //var SERVER_URL = "http://ec2-54-68-142-11.us-west-2.compute.amazonaws.com/easytutor";
+
 function createJsonResponse() {
     var input;
     var discipline = $(".breadcrumbs-list > li").next().find("a").html();
@@ -57,7 +60,7 @@ function createJsonResponse() {
 
         try {
             var xmlhttp = getXmlHttp();
-            xmlhttp.open('POST', 'http://ec2-54-68-142-11.us-west-2.compute.amazonaws.com/easytutor/rest/atutor/test/questions', false);
+            xmlhttp.open('POST', SERVER_URL + '/rest/atutor/test/questions', false);
             xmlhttp.setRequestHeader("Content-type", "application/json");
             xmlhttp.send(JSON.stringify(responseObject));
             if (xmlhttp.status == 200) {
