@@ -1,8 +1,8 @@
 $.get(chrome.extension.getURL('/injected.js'),
     function (data) {
 
-        var SERVER_URL = "http://localhost:8080/easytutor";
-        //var SERVER_URL = "http://ec2-54-68-142-11.us-west-2.compute.amazonaws.com/easytutor";
+        // var SERVER_URL = "http://localhost:8080/easytutor";
+        var SERVER_URL = "http://ec2-54-68-142-11.us-west-2.compute.amazonaws.com";
 
         var script = document.createElement("script");
         script.setAttribute("type", "text/javascript");
@@ -11,21 +11,6 @@ $.get(chrome.extension.getURL('/injected.js'),
         var modalDiv = document.createElement("div");
         modalDiv.innerHTML = "<div id='modal' class='jumbotron'></div>";
         var closeBlock = "<button type='button' class='close close-answers' data-dismiss='modal' aria-hidden='true' style='margin-top: -15px; margin-right: -15px;'>×</button> ";
-
-        var style = document.createElement("style");
-        style.innerHTML = "#modal { display: block; position: absolute;width: 400px;height: 300px; background-color: white;}" +
-
-            ".active_choice {cursor: default;border: 1px solid #eee;background: #f8f8f8;}" +
-
-            ".choices {padding: 10px 15px;margin: 6px 0;}" +
-
-            ".choices li ,.simple{padding: 10px 10px;margin: 6px 0;margin-left: 0px;}" +
-
-            "li {display: list-item;text-align: -webkit-match-parent;}" +
-
-            "ul.choices {font-family: Arial, Helvetica, sans-serif;font-size: 14px;list-style: none;margin: 0;}" +
-
-            ".mdi-navigation-check {color: green;}";
 
         var link = document.createElement("link");
         link.setAttribute("rel", "stylesheet");
@@ -197,8 +182,11 @@ $.get(chrome.extension.getURL('/injected.js'),
                                 left: xOffset,
                                 width: "300px",
                                 display: "block",
-                                height: "50px"
+                                height: "70px"
                             });
+                             $(".close-answers").click(function(){
+                    $(this).parent().css("display", "none");
+                });
                             return;
                         }
 

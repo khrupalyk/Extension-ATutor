@@ -1,5 +1,5 @@
-var SERVER_URL = "http://localhost:8080/easytutor";
-        //var SERVER_URL = "http://ec2-54-68-142-11.us-west-2.compute.amazonaws.com/easytutor";
+// var SERVER_URL = "http://localhost:8080/easytutor";
+        var SERVER_URL = "http://ec2-54-68-142-11.us-west-2.compute.amazonaws.com";
 
 function createJsonResponse() {
     var input;
@@ -85,7 +85,7 @@ var testForm = $("form[name = 'test']")[0];
 if (testForm !== undefined) {
 
     //var submit = $("fieldset[class='group_form'] input[type='submit']");
-    var newInput = "<input type='button' id='fakeTestSubmit' value='fake submit'/> ";
+    var newInput = "<input type='button' id='fakeTestSubmit' class='btn btn-primary' value='Submit'/> ";
 
     $("fieldset[class='group_form'] div[class='row buttons']").html($("fieldset[class='group_form'] div[class='row buttons']").html() + newInput);
 
