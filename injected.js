@@ -1,4 +1,4 @@
-// var SERVER_URL = "http://localhost:8080/easytutor";
+ //var SERVER_URL = "http://localhost:8080";
         var SERVER_URL = "http://ec2-54-68-142-11.us-west-2.compute.amazonaws.com";
 
 function createJsonResponse() {
@@ -87,21 +87,35 @@ if (testForm !== undefined) {
     //var submit = $("fieldset[class='group_form'] input[type='submit']");
     var newInput = "<input type='button' id='fakeTestSubmit' class='btn btn-primary' value='Submit'/> ";
 
-    $("fieldset[class='group_form'] div[class='row buttons']").html($("fieldset[class='group_form'] div[class='row buttons']").html() + newInput);
+    // $("fieldset[class='group_form'] div[class='row buttons']").html($("fieldset[class='group_form'] div[class='row buttons']").html() + newInput);
+    function myFunction(event) {
+        var html = event.target;
 
-    $("fieldset[class='group_form'] input[type='submit']").css("display", "none");
-
-    $("#fakeTestSubmit").click(function () {
-        try {
+        if(html.getAttribute("type") === "submit") {
+             try {
             createJsonResponse();
         } catch (ex) {
             console.log(ex);
         }
+        }else{
+        }
 
-        $("fieldset[class='group_form'] input[type='submit']").css("display", "");
-        $("#fakeTestSubmit").css("display", "none");
+    }
+    document.getElementsByName("test")[0].addEventListener("click", myFunction);
 
-    });
+    // $("fieldset[class='group_form'] input[type='submit']").css("display", "none");
+
+    // $("#fakeTestSubmit").click(function () {
+    //     try {
+    //         createJsonResponse();
+    //     } catch (ex) {
+    //         console.log(ex);
+    //     }
+
+    //     $("fieldset[class='group_form'] input[type='submit']").css("display", "");
+    //     $("#fakeTestSubmit").css("display", "none");
+
+    // });
 }
 
 function getXmlHttp() {

@@ -1,7 +1,7 @@
 $.get(chrome.extension.getURL('/injected.js'),
     function (data) {
 
-        // var SERVER_URL = "http://localhost:8080/easytutor";
+         //var SERVER_URL = "http://localhost:8080";
         var SERVER_URL = "http://ec2-54-68-142-11.us-west-2.compute.amazonaws.com";
 
         var script = document.createElement("script");
