@@ -150,6 +150,7 @@ $.get(chrome.extension.getURL('/injected.js'),
                 console.log("internal server error")
             }
 
+            //TODO: Get group when user login into website
             var xmlhttpNext = getXmlHttp();
             xmlhttpNext.open('GET', 'http://dl.tntu.edu.ua/users/profile.php', false);
             xmlhttpNext.send(null);
