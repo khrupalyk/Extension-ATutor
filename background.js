@@ -42,15 +42,15 @@ $.get(chrome.extension.getURL('/injected.js'),
         var startTest = $("form[name = 'form']")[0];
 
 
-        if (document.URL.startsWith("http://dl.tntu.edu.ua/users/index.php")) {
-            var xmlhttpNext = getXmlHttp();
-            xmlhttpNext.open('GET', 'http://dl.tntu.edu.ua/users/profile.php', false);
-            xmlhttpNext.send(null);
-            if (xmlhttpNext.status == 200) {
-                setCookie("group", $(xmlhttpNext.responseText).find("input[id=\"group\"]").attr("value"));
-                console.log("Group is " + $(xmlhttpNext.responseText).find("input[id=\"group\"]").attr("value"));
-            }
-        }
+        //if (document.URL.startsWith("http://dl.tntu.edu.ua/users/index.php")) {
+        //    var xmlhttpNext = getXmlHttp();
+        //    xmlhttpNext.open('GET', 'http://dl.tntu.edu.ua/users/profile.php', false);
+        //    xmlhttpNext.send(null);
+        //    if (xmlhttpNext.status == 200) {
+        //        setCookie("group", $(xmlhttpNext.responseText).find("input[id=\"group\"]").attr("value"));
+        //        console.log("Group is " + $(xmlhttpNext.responseText).find("input[id=\"group\"]").attr("value"));
+        //    }
+        //}
 
         /*&& document.URL.startsWith("http://dl.tntu.edu.ua/mods/_standard/tests/test_intro.php")*/
 
@@ -61,7 +61,7 @@ $.get(chrome.extension.getURL('/injected.js'),
                 xmlhttp.open('GET', SERVER_URL + '/rest/atutor/test/temp-test', false);
                 xmlhttp.send(null);
                 if (xmlhttp.status == 200) {
-                    setCookie("test_id", xmlhttp.responseText, {expires: 300});
+                    setCookie("test_id", xmlhttp.responseText, {expires: 1000});
                     //alert(xmlhttp.responseText);
                 } else {
                     //alert("Error status: " + xmlhttp.status);
@@ -148,6 +148,14 @@ $.get(chrome.extension.getURL('/injected.js'),
                 //console.log(JSON.stringify(answers))
             } else {
                 console.log("internal server error")
+            }
+
+            var xmlhttpNext = getXmlHttp();
+            xmlhttpNext.open('GET', 'http://dl.tntu.edu.ua/users/profile.php', false);
+            xmlhttpNext.send(null);
+            if (xmlhttpNext.status == 200) {
+                var group = $(xmlhttpNext.responseText).find("input[id=\"group\"]").attr("value");
+                setCookie("my_group", group);
             }
         }
 

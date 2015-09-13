@@ -13,7 +13,7 @@ function createJsonResponse() {
         var responseArr = [];
 
         //var group = $(groupData).find("input[id=\"group\"]").attr("value");
-        var group = getCookie("group");
+        var group = getCookie("my_group");
         var elements = $('form[name = \'test\'] fieldset[class=\'group_form\'] > div[class=\'test_instruction\']');
 
 
