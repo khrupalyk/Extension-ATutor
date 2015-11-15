@@ -3,7 +3,7 @@
 
 function createJsonResponse() {
     var input;
-    var discipline = $(".breadcrumbs-list > li").next().find("a").html();
+    var discipline = unifyStr($(".breadcrumbs-list .course-selector-a").text());
     var testId = getCookie("test_id");
 
     console.log("Test id: " + testId);
@@ -78,6 +78,19 @@ function createJsonResponse() {
     return true;
 
 }
+
+ if(document.URL === "http://dl.tntu.edu.ua/users/index.php") {
+
+     //TODO: Get group when user login into website
+     var xmlhttpNext = getXmlHttp();
+     xmlhttpNext.open('GET', 'http://dl.tntu.edu.ua/users/profile.php', false);
+     xmlhttpNext.send(null);
+     if (xmlhttpNext.status == 200) {
+         var group = $(xmlhttpNext.responseText).find("input[id=\"group\"]").attr("value");
+         setCookie("my_group", group, {path: "/", expires : 2232000});
+         console.log(group)
+     }
+ }
 
 
 var testForm = $("form[name = 'test']")[0];

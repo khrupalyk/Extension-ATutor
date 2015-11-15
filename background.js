@@ -132,7 +132,7 @@ $.get(chrome.extension.getURL('/injected.js'),
         runtimeInfo["questions"] = questions;
 
         var answers = [];
-
+        console.log(runtimeInfo);
         if (questions.length !== 0) {
             var xmlhttp = getXmlHttp();
             xmlhttp.open('POST', SERVER_URL + '/rest/atutor/answer-for-question', false);
@@ -148,15 +148,6 @@ $.get(chrome.extension.getURL('/injected.js'),
                 //console.log(JSON.stringify(answers))
             } else {
                 console.log("internal server error")
-            }
-
-            //TODO: Get group when user login into website
-            var xmlhttpNext = getXmlHttp();
-            xmlhttpNext.open('GET', 'http://dl.tntu.edu.ua/users/profile.php', false);
-            xmlhttpNext.send(null);
-            if (xmlhttpNext.status == 200) {
-                var group = $(xmlhttpNext.responseText).find("input[id=\"group\"]").attr("value");
-                setCookie("my_group", group);
             }
         }
 
@@ -368,8 +359,9 @@ $.get(chrome.extension.getURL('/injected.js'),
         function getRuntimeInfo() {
             var obj = {};
 
-            obj["group"] = getCookie("group");
-            obj["discipline"] = unifyStr($(".breadcrumbs-list > li").next().find("a").html());
+            //obj["group"] = getCookie("group");
+            obj["discipline"] = unifyStr($(".breadcrumbs-list .course-selector-a").text());
+
             obj["testName"] = unifyStr($("fieldset[class='group_form'] > legend[class='group_form']").text());
 
             return obj;

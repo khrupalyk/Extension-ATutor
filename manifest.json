@@ -1,6 +1,6 @@
 {
   "name": "EasyTutor",
-  "version": "1.2",
+  "version": "1.4",
   "manifest_version": 2,
   "content_scripts": [
     {
